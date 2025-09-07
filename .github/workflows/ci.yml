@@ -69,8 +69,7 @@ jobs:
           [[ "${{ matrix.os }}" == "windows" ]] && EXT=".exe"
           GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -trimpath \
             -ldflags="-s -w -X main.version=${VERSION}" \
-            -o "dist/gommit_${{ matrix.os }}_${{ matrix.arch }}${EXT}" ./cmd/gommit
-
+            -o "dist/gommit${EXT}" ./cmd/gommit
 
       - name: Package
         id: pkg
@@ -80,28 +79,48 @@ jobs:
           NAME="gommit_${{ steps.ver.outputs.version }}_${{ matrix.os }}_${{ matrix.arch }}"
           EXT=""
           [[ "${{ matrix.os }}" == "windows" ]] && EXT=".exe"
-          BIN="gommit_${{ matrix.os }}_${{ matrix.arch }}${EXT}"
+          BIN="gommit${EXT}"
+
+          # Verificar se o binário foi criado
+          if [[ ! -f "$BIN" ]]; then
+            echo "❌ Binary not found: $BIN"
+            ls -la
+            exit 1
+          fi
 
           mkdir "$NAME"
-          mv "$BIN" "$NAME/"
-          # incluir docs (se existirem no repo)
+          cp "$BIN" "$NAME/"
+          
+          # Incluir docs (se existirem no repo)
           for f in ../README.md ../LICENSE ../CONTRIBUTING.md; do
             [[ -f "$f" ]] && cp "$f" "$NAME/" || true
           done
 
+          # Criar pacote
           if [[ "${{ matrix.os }}" == "windows" ]]; then
             zip -r "${NAME}.zip" "$NAME"
-            echo "asset=dist/${NAME}.zip" >> $GITHUB_OUTPUT
+            ASSET_PATH="${NAME}.zip"
+            echo "✅ Created Windows package: $ASSET_PATH"
           else
             tar -czf "${NAME}.tar.gz" "$NAME"
-            echo "asset=dist/${NAME}.tar.gz" >> $GITHUB_OUTPUT
+            ASSET_PATH="${NAME}.tar.gz"
+            echo "✅ Created Unix package: $ASSET_PATH"
           fi
+          
+          # Verificar se o pacote foi criado
+          if [[ ! -f "$ASSET_PATH" ]]; then
+            echo "❌ Package creation failed: $ASSET_PATH"
+            exit 1
+          fi
+          
+          echo "asset=$ASSET_PATH" >> "$GITHUB_OUTPUT"
+          echo "package_name=$NAME" >> "$GITHUB_OUTPUT"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.pkg.outputs.asset && steps.ver.outputs.version && format('gommit_{0}_{1}_{2}', steps.ver.outputs.version, matrix.os, matrix.arch) }}
-          path: ${{ steps.pkg.outputs.asset }}
+          name: ${{ steps.pkg.outputs.package_name }}
+          path: dist/${{ steps.pkg.outputs.asset }}
           if-no-files-found: error
           compression-level: 0
 
@@ -119,25 +138,45 @@ jobs:
           path: dist
           merge-multiple: true
 
+      - name: List downloaded files
+        shell: bash
+        run: |
+          echo "📦 Downloaded artifacts:"
+          find dist -type f -name "*.tar.gz" -o -name "*.zip" | sort
+          
       - name: Generate checksums
         shell: bash
         run: |
           cd dist
           shopt -s nullglob
           rm -f SHA256SUMS.txt
-          for f in gommit_*_*.tar.gz gommit_*_*.zip; do
-            sha256sum "$f" >> SHA256SUMS.txt
+          
+          echo "🔐 Generating checksums..."
+          for f in *.tar.gz *.zip; do
+            if [[ -f "$f" ]]; then
+              sha256sum "$f" >> SHA256SUMS.txt
+              echo "✅ $f"
+            fi
           done
-          cat SHA256SUMS.txt
+          
+          if [[ -f SHA256SUMS.txt ]]; then
+            echo ""
+            echo "📋 SHA256 checksums:"
+            cat SHA256SUMS.txt
+          else
+            echo "❌ No files found for checksum generation"
+            exit 1
+          fi
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/gommit_*_*.tar.gz
-            dist/gommit_*_*.zip
+            dist/*.tar.gz
+            dist/*.zip
             dist/SHA256SUMS.txt
           draft: false
           prerelease: false
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
