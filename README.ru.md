@@ -1,10 +1,4 @@
-# gommit
-[![pt-BR](https://img.shields.io/badge/🇧🇷-Português-black)](README.pt-BR.md)
-[![ru](https://img.shields.io/badge/🇷🇺-Русский-green)](README.ru.md)
-[![hi](https://img.shields.io/badge/🇮🇳-Hindi-black)](README.hi.md)
-[![zh-CN](https://img.shields.io/badge/🇨🇳-中文-black)](README.zh-CN.md)
-[![es](https://img.shields.io/badge/🇪🇸-Español-black)](README.es.md)
-[![en](https://img.shields.io/badge/🇺🇸-English-black)](README.md)
+# Gommit [![Go Report Card](https://goreportcard.com/badge/github.com/Hangell/gommit)](https://goreportcard.com/report/github.com/Hangell/gommit) [![GitHub tag](https://img.shields.io/github/v/tag/Hangell/gommit?label=version&color=orange)](https://github.com/Hangell/gommit/tags) [![Build](https://github.com/Hangell/gommit/actions/workflows/ci.yml/badge.svg)](https://github.com/Hangell/gommit/actions/workflows/ci.yml) [![License](https://img.shields.io/github/license/Hangell/gommit)](LICENSE) [![Contributing](https://img.shields.io/badge/contributions-welcome-brightgreen)](CONTRIBUTING.md) [![Go Reference](https://pkg.go.dev/badge/github.com/Hangell/gommit.svg)](https://pkg.go.dev/github.com/Hangell/gommit)
 
 **gommit** — это быстрый CLI‑помощник для _Conventional Commits_, написанный на Go и **не требующий внешних зависимостей**.  
 Он запускает интерактивный мастер (похож на Commitizen/cz) и выполняет `git commit` с корректно отформатированным сообщением.
