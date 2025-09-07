@@ -1,4 +1,7 @@
 # gommit
+[![pt-BR](https://img.shields.io/badge/language-Português-black)](README.pt-BR.md)
+[![es](https://img.shields.io/badge/language-Español-black)](README.es.md)
+[![en](https://img.shields.io/badge/language-English-green)](README.md)
 
 **gommit** is a fast, zero-dependency command-line assistant for _Conventional Commits_, written in Go.  
 It opens an interactive wizard (similar to Commitizen/cz) and executes `git commit` with the properly formatted message.
