@@ -8,6 +8,8 @@ REPO=${REPO:-gommit}
 API="https://api.github.com/repos/$OWNER/$REPO/releases/latest"
 UA="gommit-installer"
 
+echo "Installing gommit..."
+
 uname_s=$(uname -s | tr '[:upper:]' '[:lower:]')
 case "$uname_s" in
   linux)  OS=linux ;;
@@ -22,28 +24,58 @@ case "$uname_m" in
   *) echo "Unsupported arch: $uname_m"; exit 1 ;;
 esac
 
+echo "Detected: ${OS}_${ARCH}"
+
 tmp="$(mktemp -d 2>/dev/null || mktemp -d -t gommit)"
-url=$(
-  curl -fsSL -H "User-Agent: $UA" "$API" \
-  | awk -v os="$OS" -v arch="$ARCH" -F '"' '/browser_download_url/ {print $4}' \
-  | grep "gommit_.*_${OS}_${ARCH}\.tar\.gz$" | head -n1
-)
+
+# Fetch release info and parse JSON more reliably
+echo "Fetching release information..."
+release_data=$(curl -fsSL -H "User-Agent: $UA" "$API")
+
+# Extract download URL using a more robust approach
+url=$(echo "$release_data" | grep -o '"browser_download_url": *"[^"]*"' | \
+      grep "gommit_.*_${OS}_${ARCH}\.tar\.gz" | \
+      head -n1 | \
+      sed 's/.*"browser_download_url": *"\([^"]*\)".*/\1/')
 
 if [ -z "$url" ]; then
-  echo "No matching asset for ${OS}_${ARCH}"; exit 1
+  echo "No matching asset for ${OS}_${ARCH}"
+  echo "Available assets:"
+  echo "$release_data" | grep -o '"name": *"[^"]*\.tar\.gz"' | sed 's/.*"name": *"\([^"]*\)".*/  - \1/'
+  echo "$release_data" | grep -o '"name": *"[^"]*\.zip"' | sed 's/.*"name": *"\([^"]*\)".*/  - \1/'
+  exit 1
 fi
 
-echo "Downloading $url"
+echo "Downloading $(basename "$url")"
 cd "$tmp"
 curl -fsSL -o gommit.tar.gz "$url"
+
+echo "Extracting..."
 tar -xzf gommit.tar.gz
 
-bin="$(find . -type f -name gommit -perm -111 2>/dev/null | head -n1)"
-[ -z "$bin" ] && bin="$(find . -type f -name gommit | head -n1)"
-chmod +x "$bin"
+# Find the binary more reliably
+bin=""
+for candidate in $(find . -name gommit -type f 2>/dev/null); do
+  if [ -x "$candidate" ] || [ -f "$candidate" ]; then
+    bin="$candidate"
+    break
+  fi
+done
 
+if [ -z "$bin" ]; then
+  echo "gommit binary not found in package"
+  echo "Package contents:"
+  find . -type f | head -20
+  exit 1
+fi
+
+chmod +x "$bin"
+echo "Installing..."
 "$bin" --install
 
+# Cleanup
 rm -rf "$tmp"
+
 echo ""
-echo "Done. Restart your shell and run: gommit --version"
+echo "✅ Installation completed successfully!"
+echo "Restart your shell and run: gommit --version"
