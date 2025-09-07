@@ -16,7 +16,7 @@ import (
 	"github.com/Hangell/gommit/internal/ui"
 )
 
-const version = "0.1.0"
+var version = "dev"
 
 func main() {
 	fs := flag.NewFlagSet("gommit", flag.ContinueOnError)
@@ -215,11 +215,14 @@ func buildOrPromptMessage(typeFlag, scopeFlag, subjectFlag, bodyFlag, footerFlag
 		headerType += "!"
 	}
 
-	header := headerType
+	pre := headerType
 	if scope != "" {
-		header += "(" + strings.TrimSpace(scope) + ")"
+		pre += "(" + strings.TrimSpace(scope) + ")"
 	}
-	header += ": " + subject
+	if ico := ui.EmojiFor(selected.Key); ico != "" {
+		pre += ": " + ico
+	}
+	header := pre + " " + subject
 
 	var b strings.Builder
 	b.WriteString(header)
@@ -246,8 +249,9 @@ func buildOrPromptMessage(typeFlag, scopeFlag, subjectFlag, bodyFlag, footerFlag
 	}
 
 	// valida
+	typeForValidation := selected.Key
 	if err := (commit.Message{
-		Type:    headerType,
+		Type:    typeForValidation,
 		Scope:   scope,
 		Subject: subject,
 		Body:    body,

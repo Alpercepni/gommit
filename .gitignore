@@ -6,8 +6,6 @@
 *.dylib
 
 # Binários locais do projeto
-gommit
-gommit.exe
 debug                   # binário padrão do Delve (dlv)
 
 # ——— Testes & cobertura ———
