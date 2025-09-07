@@ -1,12 +1,143 @@
 name: CI
-on: [push, pull_request]
+
+on:
+  push:
+    branches: [ main ]
+    tags:     [ 'v*' ]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-go@v3
-      with:
-        go-version: 1.21
-    - run: go test ./...
-    - run: go build ./cmd/gommit
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '>=1.22'
+          cache: true
+
+      - name: Build (sanity)
+        run: go build ./...
+
+      - name: Test
+        run: go test ./...
+
+  build:
+    name: Build (${{ matrix.os }}-${{ matrix.arch }})
+    runs-on: ubuntu-latest
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        os:   [ linux, windows, darwin ]
+        arch: [ amd64, arm64 ]
+
+    env:
+      CGO_ENABLED: 0
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '>=1.22'
+          cache: true
+
+      - name: Compute VERSION
+        id: ver
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            V="${GITHUB_REF_NAME#v}"
+          else
+            V="$(git rev-parse --short HEAD)"
+          fi
+          echo "VERSION=$V" >> "$GITHUB_ENV"
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+
+      - name: Build binary
+        shell: bash
+        run: |
+          mkdir -p dist
+          EXT=""
+          [[ "${{ matrix.os }}" == "windows" ]] && EXT=".exe"
+          # Se trocar main.version para "var", descomente o -ldflags:
+          # LDFLAGS="-s -w -X main.version=${VERSION}"
+          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -trimpath -ldflags="-s -w" \
+            -o "dist/gommit_${{ matrix.os }}_${{ matrix.arch }}${EXT}" ./cmd/gommit
+
+      - name: Package
+        id: pkg
+        shell: bash
+        run: |
+          cd dist
+          NAME="gommit_${{ steps.ver.outputs.version }}_${{ matrix.os }}_${{ matrix.arch }}"
+          EXT=""
+          [[ "${{ matrix.os }}" == "windows" ]] && EXT=".exe"
+          BIN="gommit_${{ matrix.os }}_${{ matrix.arch }}${EXT}"
+
+          mkdir "$NAME"
+          mv "$BIN" "$NAME/"
+          # incluir docs (se existirem no repo)
+          for f in ../README.md ../LICENSE ../CONTRIBUTING.md; do
+            [[ -f "$f" ]] && cp "$f" "$NAME/" || true
+          done
+
+          if [[ "${{ matrix.os }}" == "windows" ]]; then
+            zip -r "${NAME}.zip" "$NAME"
+            echo "asset=dist/${NAME}.zip" >> $GITHUB_OUTPUT
+          else
+            tar -czf "${NAME}.tar.gz" "$NAME"
+            echo "asset=dist/${NAME}.tar.gz" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.pkg.outputs.asset && steps.ver.outputs.version && format('gommit_{0}_{1}_{2}', steps.ver.outputs.version, matrix.os, matrix.arch) }}
+          path: ${{ steps.pkg.outputs.asset }}
+          if-no-files-found: error
+          compression-level: 0
+
+  release:
+    name: Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Generate checksums
+        shell: bash
+        run: |
+          cd dist
+          shopt -s nullglob
+          rm -f SHA256SUMS.txt
+          for f in gommit_*_*.tar.gz gommit_*_*.zip; do
+            sha256sum "$f" >> SHA256SUMS.txt
+          done
+          cat SHA256SUMS.txt
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/gommit_*_*.tar.gz
+            dist/gommit_*_*.zip
+            dist/SHA256SUMS.txt
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
