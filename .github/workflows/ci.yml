@@ -67,10 +67,10 @@ jobs:
           mkdir -p dist
           EXT=""
           [[ "${{ matrix.os }}" == "windows" ]] && EXT=".exe"
-          # Se trocar main.version para "var", descomente o -ldflags:
-          # LDFLAGS="-s -w -X main.version=${VERSION}"
-          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -trimpath -ldflags="-s -w" \
+          GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -trimpath \
+            -ldflags="-s -w -X main.version=${VERSION}" \
             -o "dist/gommit_${{ matrix.os }}_${{ matrix.arch }}${EXT}" ./cmd/gommit
+
 
       - name: Package
         id: pkg
