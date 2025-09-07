@@ -1,0 +1,91 @@
+# ——— Go: binários e libs nativas ———
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Binários locais do projeto
+gommit
+gommit.exe
+debug                   # binário padrão do Delve (dlv)
+
+# ——— Testes & cobertura ———
+*.test
+coverage.out
+coverage.txt
+cover.out
+*.cover
+*.cov
+*.coverprofile
+profile.cov
+coverage/               # se gerar pasta
+
+# ——— Go workspace (opcional) ———
+go.work
+
+# ——— Dependências vendorizadas (opcional) ———
+# Se pretende COMMITAR vendor (reprodutibilidade), REMOVA esta linha.
+# vendor/
+
+# ——— IDE/Editor ———
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ——— macOS ———
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# ——— Windows ———
+Desktop.ini
+Thumbs.db
+ehthumbs.db
+$RECYCLE.BIN/
+
+# ——— Logs ———
+*.log
+
+# ——— Temporários ———
+*.tmp
+*.temp
+tmp/
+temp/
+
+# ——— Artefatos de build/release ———
+dist/
+build/
+bin/
+release/
+artifacts/
+*.tar.gz
+*.zip
+*.deb
+*.rpm
+
+# ——— Variáveis de ambiente ———
+.env
+.env.local
+.env.*.local
+.envrc
+
+# ——— Config local/sensível ———
+config.local.*
+*.key
+*.pem
+
+# ——— PIDs ———
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# ——— GoReleaser ———
+.goreleaser.yml.bak
+*.checksums.txt
+*.sig
