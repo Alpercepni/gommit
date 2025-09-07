@@ -1,7 +1,10 @@
 # gommit
-[![pt-BR](https://img.shields.io/badge/language-Português-black)](README.pt-BR.md)
-[![es](https://img.shields.io/badge/language-Español-green)](README.es.md)
-[![en](https://img.shields.io/badge/language-English-black)](README.md)
+[![pt-BR](https://img.shields.io/badge/🇧🇷-Português-black)](README.pt-BR.md)
+[![ru](https://img.shields.io/badge/🇷🇺-Русский-black)](README.ru.md)
+[![hi](https://img.shields.io/badge/🇮🇳-Hindi-black)](README.hi.md)
+[![zh-CN](https://img.shields.io/badge/🇨🇳-中文-black)](README.zh-CN.md)
+[![es](https://img.shields.io/badge/🇪🇸-Español-green)](README.es.md)
+[![en](https://img.shields.io/badge/🇺🇸-English-black)](README.md)
 
 **gommit** es un asistente de línea de comandos rápido y sin dependencias para _Conventional Commits_, escrito en Go.  
 Abre un asistente interactivo (similar a Commitizen/cz) y ejecuta `git commit` con el mensaje correctamente formateado.
@@ -35,7 +38,19 @@ Abre un asistente interactivo (similar a Commitizen/cz) y ejecuta `git commit` c
 
 ## 🚀 Instalación
 
-### Método 1: Descargar Binario de Release
+### Método 1: Scripts de Instalación de Una Línea **(Recomendado)**
+
+**Windows:**
+```powershell
+powershell -ExecutionPolicy Bypass -NoProfile -Command "irm https://raw.githubusercontent.com/Hangell/gommit/main/scripts/install.ps1 | iex"
+```
+
+**Linux/macOS:**
+```bash
+curl -fsSL https://raw.githubusercontent.com/Hangell/gommit/main/scripts/install.sh | bash
+```
+
+### Método 2: Descargar Binario de Release
 1. Descarga el archivo para tu OS/arquitectura desde la página de **Releases**
 2. Extrae el paquete (`.zip` en Windows / `.tar.gz` en Linux/macOS)
 3. Ejecuta el binario extraído con la flag `--install`:
@@ -56,18 +71,6 @@ gommit --version
 ```
 
 > Ejecutar `--install` nuevamente actualizará la instalación.
-
-### Método 2: Scripts de Instalación de Una Línea
-
-**Windows:**
-```powershell
-powershell -ExecutionPolicy Bypass -NoProfile -Command "irm https://raw.githubusercontent.com/Hangell/gommit/main/scripts/install.ps1 | iex"
-```
-
-**Linux/macOS:**
-```bash
-curl -fsSL https://raw.githubusercontent.com/Hangell/gommit/main/scripts/install.sh | bash
-```
 
 ---
 

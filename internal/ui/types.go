@@ -2,12 +2,10 @@ package ui
 
 import "strings"
 
-// Types retorna a lista de tipos suportados (ordem mostrada no wizard).
 func Types() []CommitType {
 	return commitTypes
 }
 
-// FindType procura por key case-insensitive.
 func FindType(key string) (CommitType, bool) {
 	for _, ct := range commitTypes {
 		if equalFold(ct.Key, key) {
@@ -17,8 +15,6 @@ func FindType(key string) (CommitType, bool) {
 	return CommitType{}, false
 }
 
-// EmojiFor retorna SEMPRE o emoji unicode do tipo (sem fallback ASCII).
-// Use isso quando quiser colocar o emoji no header do commit.
 func EmojiFor(key string) string {
 	switch strings.ToLower(key) {
 	case "wip":

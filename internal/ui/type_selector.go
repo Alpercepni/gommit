@@ -14,7 +14,6 @@ import (
 )
 
 const (
-	// Emojis Unicode
 	IconWIP      = "🚧"
 	IconPrune    = "🔥"
 	IconFeat     = "💡"
@@ -31,7 +30,6 @@ const (
 )
 
 const (
-	// Fallback ASCII para terminais sem suporte Unicode
 	FAWIP      = "[WIP]"
 	FAPrune    = "[-]"
 	FAFeat     = "[+]"
@@ -47,10 +45,9 @@ const (
 	FARevert   = "[revert]"
 )
 
-// ANSI (cores simples) — respeita NO_COLOR
 var (
 	useColor = func() bool {
-		return os.Getenv("NO_COLOR") == "" // qualquer valor desativa
+		return os.Getenv("NO_COLOR") == ""
 	}
 
 	clrDim = func(s string) string {
@@ -113,7 +110,6 @@ func SelectCommitType() (CommitType, error) {
 		input, err := reader.ReadString('\n')
 		if err != nil {
 			if errors.Is(err, io.EOF) {
-				// EOF: sai com erro “cancelado”
 				return CommitType{}, fmt.Errorf("selection aborted (EOF)")
 			}
 			return CommitType{}, fmt.Errorf("error reading input: %w", err)
@@ -121,25 +117,21 @@ func SelectCommitType() (CommitType, error) {
 
 		input = strings.TrimSpace(input)
 
-		// Comandos de saída
 		switch strings.ToLower(input) {
 		case "q", "quit", "exit":
 			return CommitType{}, fmt.Errorf("selection aborted by user")
 		}
 
-		// Seleção por número
 		if num, err := strconv.Atoi(input); err == nil && num > 0 && num <= len(commitTypes) {
 			return commitTypes[num-1], nil
 		}
 
-		// Seleção por nome exato
 		for _, ct := range commitTypes {
 			if strings.EqualFold(input, ct.Key) {
 				return ct, nil
 			}
 		}
 
-		// Busca parcial
 		var matches []CommitType
 		inputLower := strings.ToLower(input)
 		for _, ct := range commitTypes {
@@ -155,7 +147,6 @@ func SelectCommitType() (CommitType, error) {
 
 		if len(matches) > 1 {
 			fmt.Printf("\n%s\n", clrDim("Multiple matches found. Please be more specific:"))
-			// Mostrar com tabwriter pra manter alinhado
 			w := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
 			for i, m := range matches {
 				fmt.Fprintf(w, "  %2d)\t%s\t%s\t- %s\n", i+1, clrIcon(m.Icon), clrType(m.Key), m.Description)
@@ -188,7 +179,6 @@ func displayCommitTypes() {
 }
 
 func clearScreen() {
-	// ANSI VT100 (já habilitado no Windows pelo pacote platform)
 	fmt.Print("\033[H\033[2J")
 }
 
